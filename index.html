@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Digital Clock UI Design</title>
+  <link rel="icon" href="https://avatars.githubusercontent.com/u/123867620?v=4" type="image/x-icon" />
+  <!-- Font Awesome icons -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+
+  <!-- Alarm Sound -->
+  <audio id="alarmAudio" src="Morning Alarm Tone  .mp3" preload="auto"></audio>
+
+</head>
+
+<body>
+  <div id="clock">
+    <h2>The time is now</h2>
+    <div id="time">
+      <div><span id="hour">00</span><span>Hours</span></div>
+      <div><span id="minutes">00</span><span>Minutes</span></div>
+      <div><span id="seconds">00</span><span>Seconds</span></div>
+      <div><span id="ampm"></span></div>
+    </div>
+
+    <!-- Alarm Toggle Icon -->
+    <div id="alarm-toggle"><i class="fas fa-bell"></i></div>
+
+    <!-- Alarm Section -->
+    <div id="alarm-section">
+      <h3>Set Alarm</h3>
+      <input type="time" id="alarmTime">
+      <button onclick="setAlarm()"><i class="fas fa-bell"></i> Set Alarm</button>
+      <button onclick="clearAlarm()"><i class="fas fa-times-circle"></i> Clear</button>
+      <p id="alarmStatus">No alarm set</p>
+    </div>
+  </div>
+
+  <!-- Settings Button -->
+  <div id="settings-toggle"><i class="fas fa-cog"></i></div>
+
+  <!-- Settings Panel -->
+
+<div id="settings-panel">
+	<h3>Clock Settings</h3>
+  
+	<label>
+	  <input type="checkbox" id="formatToggle">
+	  24-Hour Format
+	</label>
+  
+	<label>
+	  <input type="checkbox" id="themeToggle">
+	  Dark Mode
+	</label>
+  
+	<label>
+	  Font Size:
+	  <select id="fontSizeSelect">
+		<option value="small">Small</option>
+		<option value="medium" selected>Medium</option>
+		<option value="large">Large</option>
+	  </select>
+	</label>
+  
+	<label>
+	  Font Style:
+	  <select id="fontFamilySelect">
+		<option value="default" selected>Default</option>
+		<option value="bangla">Bangla (Noto Sans Bengali)</option>
+	  </select>
+	</label>
+  </div>
+  
+
+  <!-- JavaScript -->
+  <script>
+    let is24Hour = false;
+    let alarmTime = null;
+
+    document.getElementById('settings-toggle').onclick = function () {
+      const panel = document.getElementById('settings-panel');
+      panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    document.getElementById('formatToggle').onchange = function () {
+      is24Hour = this.checked;
+    };
+
+    document.getElementById('themeToggle').onchange = function () {
+      document.body.style.background = this.checked ? '#060a1f' : '#f0f0f0';
+      document.body.style.color = this.checked ? '#fff' : '#000';
+    };
+
+    document.getElementById('fontSizeSelect').onchange = function () {
+      const size = this.value;
+      let fontSize;
+      switch (size) {
+        case 'small':
+          fontSize = '2em';
+          break;
+        case 'medium':
+          fontSize = '3em';
+          break;
+        case 'large':
+          fontSize = '4em';
+          break;
+      }
+      document.querySelectorAll('#time div span:first-child').forEach(span => {
+        span.style.fontSize = fontSize;
+      });
+    };
+
+    document.getElementById('alarm-toggle').onclick = function () {
+      document.getElementById('alarm-section').classList.toggle('show');
+    };
+
+    function setAlarm() {
+      const input = document.getElementById('alarmTime').value;
+      if (!input) return;
+      alarmTime = input;
+      document.getElementById('alarmStatus').textContent = `Alarm set for ${alarmTime}`;
+    }
+
+    function clearAlarm() {
+      alarmTime = null;
+      document.getElementById('alarmStatus').textContent = 'No alarm set';
+    }
+
+    function checkAlarm(now) {
+      if (!alarmTime) return;
+
+      const nowFormatted = now.toTimeString().slice(0, 5); // HH:MM
+      if (nowFormatted === alarmTime) {
+        const audio = document.getElementById('alarmAudio');
+        audio.play();
+        alert('⏰ Alarm ringing!');
+        clearAlarm();
+      }
+    }
+
+    function clock() {
+      const hours = document.getElementById('hour');
+      const minutes = document.getElementById('minutes');
+      const seconds = document.getElementById('seconds');
+      const ampm = document.getElementById('ampm');
+
+      const now = new Date();
+      let h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+      const am = h >= 12 ? 'PM' : 'AM';
+
+      checkAlarm(now);
+
+      if (!is24Hour) {
+        h = h % 12;
+        h = h ? h : 12;
+      }
+
+      hours.innerHTML = h < 10 ? "0" + h : h;
+      minutes.innerHTML = m < 10 ? "0" + m : m;
+      seconds.innerHTML = s < 10 ? "0" + s : s;
+      ampm.innerHTML = is24Hour ? '' : am;
+    }
+
+    setInterval(clock, 1000);
+
+
+	document.getElementById('fontFamilySelect').onchange = function () {
+  const font = this.value;
+  if (font === 'bangla') {
+    document.body.style.fontFamily = "'Noto Sans Bengali', sans-serif";
+  } else {
+    document.body.style.fontFamily = "";
+  }
+};
+
+
+
+  </script>
+</body>
+</html>
